@@ -1,5 +1,5 @@
 /** @license
-* peVideo
+* peVideo - MIT License
 * Copyright (c) 2013 Joby Elliott
 * http://go.byjoby.net/peVideo
 * 
@@ -14,9 +14,9 @@
 * all copies or substantial portions of the Software.
 */
 
-function peVideo(options) {
+function peVideo(obj,options) {
 	var defaults = {
-		
+		minSize:300
 	};
 	//loop through all options and merge them with defaults
 	//don't do anything with tests or requirements just yet
@@ -32,8 +32,42 @@ function peVideo(options) {
 		}
 	}
 	this.options = defaults;
+	//set up window event listener
+	this.checkSize = this.debounce(this.checkSize_now);
+	window.addEventListener('resize',this.checkSize);
+	//debugging
+	console.log(this);
 }
 
-jsWebPasswordStrength.prototype.test = function (passwordToTest) {
+peVideo.prototype.checkSize_now = function () {
+	var width = window.innerWidth;
+}
+peVideo.prototype.on = function () {
 	
+}
+peVideo.prototype.off = function () {
+
+}
+/*
+	Note to self, don't debounce in prototype methods, objects need their
+	own debounced methods set up during construction
+*/
+peVideo.prototype.debounce = function (func, threshold, execAsap) {
+	var timeout;
+	return function debounced () {
+		var obj = this;
+		var args = arguments;
+		function delayed () {
+			if (!execAsap) {
+				func.apply(obj,args);
+			}
+			timeout = null;
+		}
+		if (timeout) {
+			clearTimeout(timeout);
+		}else if (execAsap) {
+			func.apply(obj,args);
+		}
+		timeout = setTimeout(delayed,threshold||100);
+	};
 }
