@@ -32,11 +32,23 @@ function peVideo(obj,options) {
 		}
 	}
 	this.options = defaults;
-	//set up window event listener
-	this.checkSize = this.debounce(this.checkSize_now);
-	window.addEventListener('resize',this.checkSize);
-	//debugging
-	console.log(this);
+	this.obj = obj;
+	//identify provider
+	this.provider = false;
+	this.href = this.obj.getAttribute('href');
+	for (var provider in this.providers) {
+		if (this.providers[provider].checkUrl(this.href)) {
+			this.provider = this.providers[provider];
+		}
+	}
+	//only do more if there is a valid provider
+	if (provider) {
+		//set up window event listener
+		this.checkSize = this.debounce(this.checkSize_now);
+		window.addEventListener('resize',this.checkSize);
+		//debugging
+		console.log(this);
+	}
 }
 
 peVideo.prototype.checkSize_now = function () {
@@ -48,6 +60,27 @@ peVideo.prototype.on = function () {
 peVideo.prototype.off = function () {
 
 }
+/*
+	Objects for defining and embedding various providers
+	Also for retrieving thumbnail videos
+	This is also where the url-sniffing rules live
+*/
+peVideo.prototype.providers = {}
+//YouTube
+	peVideo.prototype.providers.YouTube = {
+		checkUrl: function (url) {
+			return (
+				true
+			);
+		},
+		thumbnail: function () {
+			return "YouTube thumbnail url"; 
+		},
+		embedCode: function () {
+			return "YouTube embed code";
+		},
+	}
+
 /*
 	Note to self, don't debounce in prototype methods, objects need their
 	own debounced methods set up during construction
