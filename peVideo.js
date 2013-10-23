@@ -46,9 +46,8 @@ function peVideo(obj,options) {
 		//set up window event listener
 		this.checkSize = this.debounce(this.checkSize_now);
 		window.addEventListener('resize',this.checkSize);
-		//debugging
-		console.log(this);
 	}
+	console.log(this);
 }
 
 peVideo.prototype.checkSize_now = function () {
@@ -70,10 +69,14 @@ peVideo.prototype.providers = {}
 	peVideo.prototype.providers.YouTube = {
 		checkUrl: function (url) {
 			return (
-				true
+				url.match(/\/\/(www\.)?youtube\.com/) ||
+				url.match(/\/\/youtu.be/)
 			);
 		},
-		thumbnail: function () {
+		videoID: function (url) {
+			return "nothing";
+		},
+		thumbnail: function (url) {
 			return "YouTube thumbnail url"; 
 		},
 		embedCode: function () {
