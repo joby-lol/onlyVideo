@@ -15,23 +15,10 @@
 */
 
 function peVideo(obj,options) {
-	var defaults = {
-		YouTube_rel:1
-	};
-	//loop through all options and merge them with defaults
-	//don't do anything with tests or requirements just yet
-	if (typeof(options) == 'object') {
-		for (var prop in options) {
-			if (options.hasOwnProperty(prop)) {
-				switch (prop)
-				{
-					default:
-						defaults[prop] = options[prop];
-				}
-			}
-		}
-	}
-	this.options = defaults;
+	this.options = {};
+	//set options
+	this.setOptions(options);
+	//save original link
 	this.originalLink = obj;
 	//identify provider
 	this.provider = false;
@@ -48,6 +35,24 @@ function peVideo(obj,options) {
 		window.addEventListener('resize',this.checkSize);
 		this.on();
 		console.log(this);
+	}
+}
+peVideo.prototype.setOptions = function (options) {
+	if (typeof(options) == 'object') {
+		for (var prop in options) {
+			if (options.hasOwnProperty(prop)) {
+				this.options[prop] = options[prop];
+			}
+		}
+	}
+}
+peVideo.prototype.setDefaults = function (options) {
+	if (typeof(options) == 'object') {
+		for (var prop in options) {
+			if (options.hasOwnProperty(prop) && !this.options.hasOwnProperty(prop)) {
+				this.options[prop] = options[prop];
+			}
+		}
 	}
 }
 
@@ -94,6 +99,10 @@ peVideo.prototype.clickHandler = function (pe,event) {
 peVideo.prototype.providers = {}
 //YouTube
 	peVideo.prototype.providers.YouTube = function (pe) {
+		//add new default configuration
+		pe.setDefaults({
+			YouTube_rel:1
+		});
 		//extract video ID from url
 		console.log("initializing YouTube provider from url "+pe.href);
 		if (/\/\/(www\.)?youtube\.com/.test(pe.href)) {
