@@ -16,7 +16,7 @@
 
 function peVideo(obj,options) {
 	var defaults = {
-		minSize:300
+		YouTube_rel:1
 	};
 	//loop through all options and merge them with defaults
 	//don't do anything with tests or requirements just yet
@@ -32,13 +32,13 @@ function peVideo(obj,options) {
 		}
 	}
 	this.options = defaults;
-	this.obj = obj;
+	this.originalLink = obj;
 	//identify provider
 	this.provider = false;
-	this.href = this.obj.getAttribute('href');
+	this.href = this.originalLink.getAttribute('href');
 	for (var provider in this.providers) {
 		if (this.providers[provider].checkUrl(this.href)) {
-			this.provider = this.providers[provider];
+			this.provider = new this.providers[provider](this);
 		}
 	}
 	//only do more if there is a valid provider
@@ -46,18 +46,45 @@ function peVideo(obj,options) {
 		//set up window event listener
 		this.checkSize = this.debounce(this.checkSize_now);
 		window.addEventListener('resize',this.checkSize);
+		this.on();
+		console.log(this);
 	}
-	console.log(this);
 }
 
 peVideo.prototype.checkSize_now = function () {
 	var width = window.innerWidth;
 }
 peVideo.prototype.on = function () {
-	
+	//set up display element
+	this.displayObj = this.originalLink.insertAdjacentElement("afterEnd",document.createElement("DIV"));
+	this.originalLink.parentNode.removeChild(this.originalLink);
+	this.displayObj.setAttribute("class","peVideo");
+	//add thumbnail
+	this.displayObj.displayThumbnail = this.displayObj.appendChild(document.createElement("IMG"));
+	this.displayObj.displayThumbnail.setAttribute("class","peVideo-displayThumbnail");
+	//add caption
+	this.displayObj.displayCaption = this.displayObj.appendChild(document.createElement("DIV"));
+	this.displayObj.displayCaption.setAttribute("class","peVideo-displayCaption");;
+	//add link
+	this.displayObj.displayLink = this.displayObj.appendChild(document.createElement("A"));
+	this.displayObj.displayLink.setAttribute("class","peVideo-displayLink");
+	this.displayObj.displayLink.setAttribute("href",this.href);
+	//set up event handlers
+	var clickHandler = this.clickHandler;
+	var pe = this;
+	pe.touch = false;
+	this.displayObj.displayLink.addEventListener("touchstart",function(event){pe.touch = true;pe.displayObj.displayCaption.innerHTML="touch";});
+	this.displayObj.displayLink.addEventListener("touchend",function(event){setTimeout(function(){pe.touch = false;pe.displayObj.displayCaption.innerHTML="no touch";},100);});
+	this.displayObj.displayLink.addEventListener("click",function(event){clickHandler(pe,event)});
 }
 peVideo.prototype.off = function () {
 
+}
+peVideo.prototype.clickHandler = function (pe,event) {
+	if (!pe.touch) {
+		pe.displayObj.innerHTML = pe.provider.embedCode;
+		event.preventDefault();
+	}
 }
 /*
 	Objects for defining and embedding various providers
@@ -66,22 +93,28 @@ peVideo.prototype.off = function () {
 */
 peVideo.prototype.providers = {}
 //YouTube
-	peVideo.prototype.providers.YouTube = {
-		checkUrl: function (url) {
-			return (
-				url.match(/\/\/(www\.)?youtube\.com/) ||
-				url.match(/\/\/youtu.be/)
-			);
-		},
-		videoID: function (url) {
-			return "nothing";
-		},
-		thumbnail: function (url) {
-			return "YouTube thumbnail url"; 
-		},
-		embedCode: function () {
-			return "YouTube embed code";
-		},
+	peVideo.prototype.providers.YouTube = function (pe) {
+		//extract video ID from url
+		console.log("initializing YouTube provider from url "+pe.href);
+		if (/\/\/(www\.)?youtube\.com/.test(pe.href)) {
+			this.videoID = pe.href.match(/v=([^&]+)/)[1];
+			console.log(this);
+		}else if (/\/\/youtu.be/.test(pe.href)) {
+			this.videoID = pe.href.match(/\.be\/([^?]+)/)[1];
+			console.log(this);
+		}
+		//check for start point
+		this.videoStart = pe.href.match(/[?&]t=([0-9]+)s/);
+		this.videoStart = this.videoStart?this.videoStart[1]:false;
+		//set up what the exterior needs
+		var iframeSrc = '//www.youtube.com/embed/'+this.videoID+'?'+(this.videoStart?'start='+this.videoStart+'&':'')+'rel='+pe.options.YouTube_rel+'&autohide=1&autoplay=1&modestbranding=1';
+		this.embedCode = '<iframe class="peVideo-embed" src="'+iframeSrc+'" frameborder="0" allowfullscreen></iframe>';
+	}
+	peVideo.prototype.providers.YouTube.checkUrl = function (url) {
+		return (
+			/\/\/(www\.)?youtube\.com/.test(url) ||
+			/\/\/youtu.be/.test(url)
+		);
 	}
 
 /*
