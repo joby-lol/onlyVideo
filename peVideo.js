@@ -15,7 +15,11 @@
 */
 
 function peVideo(obj,options) {
-	this.options = {};
+	this.options = {
+		aspectRatio: 16/9,
+		controlSizeV: 0,
+		controlSizeH: 0
+	};
 	//set options
 	this.setOptions(options);
 	//save original link
@@ -31,9 +35,10 @@ function peVideo(obj,options) {
 	//only do more if there is a valid provider
 	if (provider) {
 		//set up window event listener
-		this.checkSize = this.debounce(this.checkSize_now);
-		window.addEventListener('resize',this.checkSize);
+		var pe = this;
 		this.on();
+		window.addEventListener('resize',this.debounce(function(){pe.checkSize(pe)}));
+		pe.checkSize(pe);
 		console.log(this);
 	}
 }
@@ -56,10 +61,19 @@ peVideo.prototype.setDefaults = function (options) {
 	}
 }
 
-peVideo.prototype.checkSize_now = function () {
-	var width = window.innerWidth;
+peVideo.prototype.checkSize = function (pe) {
+	var width = pe.displayObj.offsetWidth-pe.options.controlSizeH;
+	var height = Math.round(width/pe.options.aspectRatio)+pe.options.controlSizeV;
+	pe.displayObj.style.height = height+'px';
+	//adjust thumbnail position
+	if (pe.thumbLoaded) {
+		var thumbHeight = pe.displayObj.displayThumbnail.offsetHeight;
+		var thumbTop = Math.round((height-thumbHeight)/2);
+		pe.displayObj.displayThumbnail.style.top = thumbTop+'px';
+	}
 }
 peVideo.prototype.on = function () {
+	var pe = this;
 	//set up display element
 	this.displayObj = this.originalLink.insertAdjacentElement("afterEnd",document.createElement("DIV"));
 	this.originalLink.parentNode.removeChild(this.originalLink);
@@ -67,6 +81,10 @@ peVideo.prototype.on = function () {
 	//add thumbnail
 	this.displayObj.displayThumbnail = this.displayObj.appendChild(document.createElement("IMG"));
 	this.displayObj.displayThumbnail.setAttribute("class","peVideo-displayThumbnail");
+	this.displayObj.displayThumbnail.addEventListener('load',function(){pe.thumbLoaded = true;pe.checkSize(pe);});
+	if (this.provider.videoThumbnail) {
+		this.displayObj.displayThumbnail.setAttribute('src',this.provider.videoThumbnail);
+	}
 	//add caption
 	this.displayObj.displayCaption = this.displayObj.appendChild(document.createElement("DIV"));
 	this.displayObj.displayCaption.setAttribute("class","peVideo-displayCaption");;
@@ -78,8 +96,8 @@ peVideo.prototype.on = function () {
 	var clickHandler = this.clickHandler;
 	var pe = this;
 	pe.touch = false;
-	this.displayObj.displayLink.addEventListener("touchstart",function(event){pe.touch = true;pe.displayObj.displayCaption.innerHTML="touch";});
-	this.displayObj.displayLink.addEventListener("touchend",function(event){setTimeout(function(){pe.touch = false;pe.displayObj.displayCaption.innerHTML="no touch";},100);});
+	this.displayObj.displayLink.addEventListener("touchstart",function(event){pe.touch = true;pe.touchInProgress = true;pe.displayObj.displayCaption.innerHTML="touch";});
+	this.displayObj.displayLink.addEventListener("touchend",function(event){setTimeout(function(){pe.touchInProgress = false;pe.displayObj.displayCaption.innerHTML="no touch";},100);});
 	this.displayObj.displayLink.addEventListener("click",function(event){clickHandler(pe,event)});
 }
 peVideo.prototype.off = function () {
@@ -88,6 +106,7 @@ peVideo.prototype.off = function () {
 peVideo.prototype.clickHandler = function (pe,event) {
 	if (!pe.touch) {
 		pe.displayObj.innerHTML = pe.provider.embedCode;
+		pe.displayObj.setAttribute('class','peVideo peVideo-activated')
 		event.preventDefault();
 	}
 }
@@ -118,6 +137,9 @@ peVideo.prototype.providers = {}
 		//set up what the exterior needs
 		var iframeSrc = '//www.youtube.com/embed/'+this.videoID+'?'+(this.videoStart?'start='+this.videoStart+'&':'')+'rel='+pe.options.YouTube_rel+'&autohide=1&autoplay=1&modestbranding=1';
 		this.embedCode = '<iframe class="peVideo-embed" src="'+iframeSrc+'" frameborder="0" allowfullscreen></iframe>';
+		//set thumbnail url
+		this.videoThumbnail = "//img.youtube.com/vi/"+this.videoID+"/hqdefault.jpg";
+		//pe.displayObj.displayThumbnail.setAttribute('src',this.videoThumbnail);
 	}
 	peVideo.prototype.providers.YouTube.checkUrl = function (url) {
 		return (

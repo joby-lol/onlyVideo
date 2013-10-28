@@ -1,8 +1,11 @@
 .peVideo {
-	min-height:100px;
-	background:#eee;
+	background:#000;
 	overflow:hidden;
 	position:relative;
+	transition:height 0.15s linear;
+}
+.peVideo-activated {
+	transition:none;
 }
 .peVideo-displayLink {
 	position:absolute;
@@ -15,9 +18,14 @@
 }
 .peVideo-displayCaption {
 	position:absolute;
-	top:0;
 	right:0;
 	left:0;
+}
+.peVideo-displayThumbnail {
+	position:absolute;
+	left:0;
+	top:0;
+	width:100%;
 }
 .peVideo-embed {
 	position:absolute;
