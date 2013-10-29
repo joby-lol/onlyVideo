@@ -37,7 +37,7 @@ function peVideo(obj,options) {
 		//set up window event listener
 		var pe = this;
 		this.on();
-		window.addEventListener('resize',this.debounce(function(){pe.checkSize(pe)}));
+		window.addEventListener('resize',this.debounce(function(){pe.checkSize(pe)},250));
 		pe.checkSize(pe);
 		console.log(this);
 	}
