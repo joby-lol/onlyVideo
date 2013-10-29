@@ -87,7 +87,8 @@ peVideo.prototype.on = function () {
 	}
 	//add caption
 	this.displayObj.displayCaption = this.displayObj.appendChild(document.createElement("DIV"));
-	this.displayObj.displayCaption.setAttribute("class","peVideo-displayCaption");;
+	this.displayObj.displayCaption.setAttribute("class","peVideo-displayCaption");
+	this.displayObj.displayCaption.innerHTML = this.originalLink.innerHTML;
 	//add link
 	this.displayObj.displayLink = this.displayObj.appendChild(document.createElement("A"));
 	this.displayObj.displayLink.setAttribute("class","peVideo-displayLink");
