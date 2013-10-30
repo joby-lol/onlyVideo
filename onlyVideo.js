@@ -1,7 +1,7 @@
 /** @license
-* peVideo - MIT License
+* onlyVideo - MIT License
 * Copyright (c) 2013 Joby Elliott
-* http://go.byjoby.net/peVideo
+* http://go.byjoby.net/onlyVideo
 * 
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -14,7 +14,7 @@
 * all copies or substantial portions of the Software.
 */
 
-function peVideo(obj,options) {
+function onlyVideo(obj,options) {
 	this.options = {
 		aspectRatio: 16/9,
 		controlSizeV: 0,
@@ -42,7 +42,7 @@ function peVideo(obj,options) {
 		console.log(this);
 	}
 }
-peVideo.prototype.setOptions = function (options) {
+onlyVideo.prototype.setOptions = function (options) {
 	if (typeof(options) == 'object') {
 		for (var prop in options) {
 			if (options.hasOwnProperty(prop)) {
@@ -51,7 +51,7 @@ peVideo.prototype.setOptions = function (options) {
 		}
 	}
 }
-peVideo.prototype.setDefaults = function (options) {
+onlyVideo.prototype.setDefaults = function (options) {
 	if (typeof(options) == 'object') {
 		for (var prop in options) {
 			if (options.hasOwnProperty(prop) && !this.options.hasOwnProperty(prop)) {
@@ -61,7 +61,7 @@ peVideo.prototype.setDefaults = function (options) {
 	}
 }
 
-peVideo.prototype.checkSize = function (pe) {
+onlyVideo.prototype.checkSize = function (pe) {
 	var width = pe.displayObj.offsetWidth-pe.options.controlSizeH;
 	var height = Math.round(width/pe.options.aspectRatio)+pe.options.controlSizeV;
 	pe.displayObj.style.height = height+'px';
@@ -72,26 +72,26 @@ peVideo.prototype.checkSize = function (pe) {
 		pe.displayObj.displayThumbnail.style.top = thumbTop+'px';
 	}
 }
-peVideo.prototype.on = function () {
+onlyVideo.prototype.on = function () {
 	var pe = this;
 	//set up display element
 	this.displayObj = this.originalLink.insertAdjacentElement("afterEnd",document.createElement("DIV"));
 	this.originalLink.parentNode.removeChild(this.originalLink);
-	this.displayObj.setAttribute("class","peVideo");
+	this.displayObj.setAttribute("class","onlyVideo");
 	//add thumbnail
 	this.displayObj.displayThumbnail = this.displayObj.appendChild(document.createElement("IMG"));
-	this.displayObj.displayThumbnail.setAttribute("class","peVideo-displayThumbnail");
+	this.displayObj.displayThumbnail.setAttribute("class","onlyVideo-displayThumbnail");
 	this.displayObj.displayThumbnail.addEventListener('load',function(){pe.thumbLoaded = true;pe.checkSize(pe);});
 	if (this.provider.videoThumbnail) {
 		this.displayObj.displayThumbnail.setAttribute('src',this.provider.videoThumbnail);
 	}
 	//add caption
 	this.displayObj.displayCaption = this.displayObj.appendChild(document.createElement("DIV"));
-	this.displayObj.displayCaption.setAttribute("class","peVideo-displayCaption");
+	this.displayObj.displayCaption.setAttribute("class","onlyVideo-displayCaption");
 	this.displayObj.displayCaption.innerHTML = this.originalLink.innerHTML;
 	//add link
 	this.displayObj.displayLink = this.displayObj.appendChild(document.createElement("A"));
-	this.displayObj.displayLink.setAttribute("class","peVideo-displayLink");
+	this.displayObj.displayLink.setAttribute("class","onlyVideo-displayLink");
 	this.displayObj.displayLink.setAttribute("href",this.href);
 	//set up event handlers
 	var clickHandler = this.clickHandler;
@@ -101,13 +101,13 @@ peVideo.prototype.on = function () {
 	this.displayObj.displayLink.addEventListener("touchend",function(event){setTimeout(function(){pe.touchInProgress = false;pe.displayObj.displayCaption.innerHTML="no touch";},100);});
 	this.displayObj.displayLink.addEventListener("click",function(event){clickHandler(pe,event)});
 }
-peVideo.prototype.off = function () {
+onlyVideo.prototype.off = function () {
 
 }
-peVideo.prototype.clickHandler = function (pe,event) {
+onlyVideo.prototype.clickHandler = function (pe,event) {
 	if (!pe.touch) {
 		pe.displayObj.innerHTML = pe.provider.embedCode;
-		pe.displayObj.setAttribute('class','peVideo peVideo-activated')
+		pe.displayObj.setAttribute('class','onlyVideo onlyVideo-activated')
 		event.preventDefault();
 	}
 }
@@ -116,9 +116,9 @@ peVideo.prototype.clickHandler = function (pe,event) {
 	Also for retrieving thumbnail videos
 	This is also where the url-sniffing rules live
 */
-peVideo.prototype.providers = {}
+onlyVideo.prototype.providers = {}
 //YouTube
-	peVideo.prototype.providers.YouTube = function (pe) {
+	onlyVideo.prototype.providers.YouTube = function (pe) {
 		//add new default configuration
 		pe.setDefaults({
 			YouTube_rel:1
@@ -137,12 +137,12 @@ peVideo.prototype.providers = {}
 		this.videoStart = this.videoStart?this.videoStart[1]:false;
 		//set up what the exterior needs
 		var iframeSrc = '//www.youtube.com/embed/'+this.videoID+'?'+(this.videoStart?'start='+this.videoStart+'&':'')+'rel='+pe.options.YouTube_rel+'&autohide=1&autoplay=1&modestbranding=1';
-		this.embedCode = '<iframe class="peVideo-embed" src="'+iframeSrc+'" frameborder="0" allowfullscreen></iframe>';
+		this.embedCode = '<iframe class="onlyVideo-embed" src="'+iframeSrc+'" frameborder="0" allowfullscreen></iframe>';
 		//set thumbnail url
 		this.videoThumbnail = "//img.youtube.com/vi/"+this.videoID+"/hqdefault.jpg";
 		//pe.displayObj.displayThumbnail.setAttribute('src',this.videoThumbnail);
 	}
-	peVideo.prototype.providers.YouTube.checkUrl = function (url) {
+	onlyVideo.prototype.providers.YouTube.checkUrl = function (url) {
 		return (
 			/\/\/(www\.)?youtube\.com/.test(url) ||
 			/\/\/youtu.be/.test(url)
@@ -153,7 +153,7 @@ peVideo.prototype.providers = {}
 	Note to self, don't debounce in prototype methods, objects need their
 	own debounced methods set up during construction
 */
-peVideo.prototype.debounce = function (func, threshold, execAsap) {
+onlyVideo.prototype.debounce = function (func, threshold, execAsap) {
 	var timeout;
 	return function debounced () {
 		var obj = this;

@@ -1,13 +1,13 @@
-.peVideo {
+.onlyVideo {
 	background:#000;
 	overflow:hidden;
 	position:relative;
 	transition:height 0.1s linear;
 }
-.peVideo-activated {
+.onlyVideo-activated {
 	transition:none;
 }
-.peVideo-displayLink {
+.onlyVideo-displayLink {
 	position:absolute;
 	top:0;
 	left:0;
@@ -16,7 +16,7 @@
 	/*IE needs SOME background for a link to display above anything else*/
 	background:rgba(0,0,0,0);
 }
-.peVideo-displayLink:after {
+.onlyVideo-displayLink:after {
 	content:"";
 	display:block;
 	background:#000;
@@ -35,10 +35,10 @@
 	margin:0 auto;
 	margin-top:23%;
 }
-.peVideo:hover .peVideo-displayLink:after {
+.onlyVideo:hover .onlyVideo-displayLink:after {
 	opacity:1;
 }
-.peVideo-displayCaption {
+.onlyVideo-displayCaption {
 	position:absolute;
 	right:0;
 	left:0;
@@ -50,16 +50,16 @@
 	padding:0.25em 0.5em;
 	opacity:0.8;
 }
-.peVideo:hover .peVideo-displayCaption {
+.onlyVideo:hover .onlyVideo-displayCaption {
 	opacity:1;
 }
-.peVideo-displayThumbnail {
+.onlyVideo-displayThumbnail {
 	position:absolute;
 	left:0;
 	top:0;
 	width:100%;
 }
-.peVideo-embed {
+.onlyVideo-embed {
 	position:absolute;
 	top:0;
 	left:0;

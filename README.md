@@ -1,5 +1,5 @@
-#peVideo
+#onlyVideo
 
 ##Progressively enhanced, fast-rendering video embeds
 
-View a demo at: [http://demo.byjoby.net/peVideo/demo.html]
+View a demo at: http://demo.byjoby.net/onlyVideo/demo.html
