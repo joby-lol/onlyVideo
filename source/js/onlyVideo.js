@@ -54,7 +54,7 @@ onlyVideo.prototype.setOptions = function (options) {
 onlyVideo.prototype.setDefaults = function (options) {
 	if (typeof(options) == 'object') {
 		for (var prop in options) {
-			if (options.hasOwnProperty(prop) && !this.options.hasOwnProperty(prop)) {
+			if (options.hasOwnProperty(prop) && this.options[prop] === undefined) {
 				this.options[prop] = options[prop];
 			}
 		}
